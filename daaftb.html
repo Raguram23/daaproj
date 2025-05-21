@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Exponentiation: Divide and Conquer vs Brute Force</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      padding: 30px;
+      text-align: center;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    .calculator {
+      background: white;
+      display: inline-block;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+    input[type="number"], select {
+      padding: 10px;
+      margin: 10px;
+      width: 120px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 25px;
+      background-color: #2e86de;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #1e6bb8;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #2d3436;
+    }
+    .highlight {
+      color: #27ae60;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>⚡ Exponentiation: Divide & Conquer vs Brute Force</h1>
+  
+  <div class="calculator">
+    <div>
+      <label>Enter base (a): </label>
+      <input type="number" id="base" placeholder="a" />
+    </div>
+    <div>
+      <label>Enter exponent (n): </label>
+      <input type="number" id="exponent" placeholder="n" min="0" />
+    </div>
+    <div>
+      <label>Method: </label>
+      <select id="method">
+        <option value="divide">Divide & Conquer</option>
+        <option value="brute">Brute Force</option>
+      </select>
+    </div>
+    <button onclick="computePower()">Compute aⁿ</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    let bruteCycles = 0;
+    let divideCycles = 0;
+
+    // Brute-force method: Time complexity O(n)
+    function powerBruteForce(a, n) {
+      bruteCycles = 0;
+      let result = 1;
+      for (let i = 0; i < n; i++) {
+        result *= a;
+        bruteCycles++;
+      }
+      return result;
+    }
+
+    // Divide and conquer method: Time complexity O(log n)
+    function powerDivideConquer(a, n) {
+      divideCycles++;
+      if (n === 0) return 1;
+      if (n === 1) return a;
+      const temp = powerDivideConquer(a, Math.floor(n / 2));
+      return n % 2 === 0 ? temp * temp : temp * temp * a;
+    }
+
+    function computePower() {
+      const a = parseFloat(document.getElementById('base').value);
+      const n = parseInt(document.getElementById('exponent').value);
+      const method = document.getElementById('method').value;
+      const resultDiv = document.getElementById('result');
+
+      if (isNaN(a) || isNaN(n) || n < 0) {
+        resultDiv.innerText = "Please enter a valid base and non-negative exponent.";
+        return;
+      }
+
+      let result, complexity, cycles;
+      if (method === "divide") {
+        divideCycles = 0;
+        result = powerDivideConquer(a, n);
+        complexity = "O(log n)";
+        cycles = divideCycles;
+      } else {
+        bruteCycles = 0;
+        result = powerBruteForce(a, n);
+        complexity = "O(n)";
+        cycles = bruteCycles;
+      }
+
+      resultDiv.innerHTML = `
+        <div><span class="highlight">${a}^${n} = ${result}</span></div>
+        <div>Method: <b>${method === "divide" ? "Divide & Conquer" : "Brute Force"}</b></div>
+        <div>Time Complexity: <b>${complexity}</b></div>
+        <div>Cycle Count: <b>${cycles}</b></div>
+      `;
+    }
+  </script>
+
+</body>
+</html>
